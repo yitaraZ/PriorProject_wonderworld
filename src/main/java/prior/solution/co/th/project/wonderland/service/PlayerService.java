@@ -120,12 +120,11 @@ public class PlayerService {
         result.setStatus(205);
         result.setDescription("player attack!");
         try{
-            Map<String, Object> playerMap = (Map<String, Object>) data.get("playerModel");
-            Map<String, Object> monsterMap = (Map<String, Object>) data.get("monsterModel");
 
-            int playerId = (Integer) playerMap.get("pId");
 
-            int monsId = (Integer) monsterMap.get("mId");
+            int playerId = (Integer) data.get("pId");
+
+            int monsId = (Integer) data.get("mId");
 
             PlayerModel player = playerNativeRepository.findPlayer(playerId);
             MonsterModel monster = monsterNativeRepository.findMonster(monsId);

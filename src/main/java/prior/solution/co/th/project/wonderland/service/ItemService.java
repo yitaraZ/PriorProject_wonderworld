@@ -80,13 +80,13 @@ public class ItemService {
         return result;
     }
 
-    public ResponseModel<ItemModel> getItemByNativeSql(ItemModel itemModel){
+    public ResponseModel<ItemModel> getItemByNativeSql(int itemId){
         ResponseModel<ItemModel> result = new ResponseModel<>();
 
         result.setStatus(204);
         result.setDescription("find item succes");
         try{
-            ItemModel transfromedData = itemNativeRepository.findItem(itemModel);
+            ItemModel transfromedData = itemNativeRepository.findItem(itemId);
             result.setData(transfromedData);
 
         }catch (Exception e){

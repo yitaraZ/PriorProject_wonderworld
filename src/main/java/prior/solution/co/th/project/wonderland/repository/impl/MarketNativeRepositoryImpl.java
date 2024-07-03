@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import prior.solution.co.th.project.wonderland.model.InboxModel;
 import prior.solution.co.th.project.wonderland.model.MarketModel;
+import prior.solution.co.th.project.wonderland.model.PlayerModel;
 import prior.solution.co.th.project.wonderland.repository.MarketNativeRepository;
 
 import java.sql.ResultSet;
@@ -94,6 +95,29 @@ public class MarketNativeRepositoryImpl implements MarketNativeRepository {
             paramList.add(marketModel.getListId());
             this.jdbcTemplate.update(sql, paramList.toArray());
         }
+    }
+
+    @Override
+    public MarketModel findList(int ListId) {
+        List<Object> paramList = new ArrayList<>();
+
+        String sql = "select list_id, seller_id, i_id, quantity, price, status from market WHERE list_id = ?";
+        paramList.add(ListId);
+
+        MarketModel result = this.jdbcTemplate.queryForObject(sql, paramList.toArray(), new RowMapper<MarketModel>() {
+            @Override
+            public MarketModel mapRow(ResultSet rs, int rowNum) throws SQLException {
+                MarketModel market = new MarketModel();
+                market.setListId(rs.getInt("list_id"));
+                market.setSellerId(rs.getInt("seller_id"));
+                market.setItemId(rs.getInt("i_id"));
+                market.setQty(rs.getInt("quantity"));
+                market.setPrice(rs.getDouble("price"));
+                market.setStatus(rs.getString("status"));
+                return market;
+            }
+        });
+        return result;
     }
 
 

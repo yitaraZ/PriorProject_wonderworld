@@ -9,7 +9,7 @@ public interface ItemNativeRepository {
 
     public List<ItemModel>  findAllItem();
 
-    public ItemModel findItem(ItemModel itemModel);
+    public ItemModel findItem(int itemId);
 
     public int insertItem(List<ItemModel> itemModels);
 

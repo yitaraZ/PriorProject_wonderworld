@@ -44,11 +44,11 @@ public class ItemNativeRepositoryImpl implements ItemNativeRepository {
     }
 
     @Override
-    public ItemModel findItem(ItemModel itemModel) {
+    public ItemModel findItem(int itemId) {
         List<Object> paramList = new ArrayList<>();
 
         String sql = "SELECT i_id, i_name, description, i_price FROM item WHERE i_id = ?";
-        paramList.add(itemModel.getItemId());
+        paramList.add(itemId);
 
         ItemModel result = this.jdbcTemplate.queryForObject(sql, paramList.toArray(), new RowMapper<ItemModel>() {
             @Override

@@ -14,4 +14,5 @@ public interface MarketNativeRepository {
 
     public void deleteList(MarketModel marketModel);
 
+    public MarketModel findList(int ListId);
 }

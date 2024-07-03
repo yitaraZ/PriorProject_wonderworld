@@ -1,5 +1,6 @@
 package prior.solution.co.th.project.wonderland.service;
 
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Service;
 import prior.solution.co.th.project.wonderland.model.*;
 import prior.solution.co.th.project.wonderland.repository.*;
@@ -82,17 +83,56 @@ public class MarketService {
     }
 
     //ซื้อไอเทม
-    public ResponseModel<Void> buyItemByNativeSql (Map<String, Object> data){
-        ResponseModel<Void> result = new ResponseModel<>();
+    public ResponseModel<String> buyItemByNativeSql (Map<String, Object> data){
+        ResponseModel<String> result = new ResponseModel<>();
 
         result.setStatus(206);
         result.setDescription("buy item success");
         try{
-            Map<String, Object> playerMap = (Map<String, Object>) data.get("playerModel");
-            Map<String, Object> itemMap = (Map<String, Object>) data.get("itemModel");
 
-            PlayerModel playerModel = new PlayerModel();
-            playerModel.setPId((Integer) playerMap.get("pId"));
+            int playerId = (Integer) data.get("pId");
+            int listId = (Integer) data.get("listId");
+
+            PlayerModel playerModel = this.playerNativeRepository.findPlayer(playerId);
+            MarketModel marketModel = this.marketNativeRepository.findList(listId);
+
+            int itemId = marketModel.getItemId();
+
+            ItemModel itemModel = this.itemNativeRepository.findItem(itemId);
+
+            double playerBalance = playerModel.getBalance();
+            double itemPrice = itemModel.getItemPrice();
+            List<PlayerItemModel> playerItem = new ArrayList<>();
+
+            if(playerBalance >= itemPrice){
+                playerBalance -= itemPrice;
+                playerModel.setBalance(playerBalance);
+                this.playerNativeRepository.updatePlayer(playerModel);
+
+                PlayerModel seller = this.playerNativeRepository.findPlayer(marketModel.getSellerId());
+                double sellerBalance = seller.getBalance() + itemPrice;
+                seller.setBalance(sellerBalance);
+                this.playerNativeRepository.updatePlayer(seller);
+
+                PlayerItemModel pi = new PlayerItemModel();
+                pi.setItemId(itemId);
+                pi.setPId(playerId);
+                pi.setQuantity(1);
+                playerItem.add(pi);
+                this.playerItemNativeRepository.insertPlayerItem(playerItem);
+
+                InboxModel inboxModel = new InboxModel();
+                inboxModel.setPId(marketModel.getSellerId());
+                inboxModel.setMessage("Your item was sold");
+                this.inboxNativeRepository.insertInbox(inboxModel);
+
+                marketModel.setStatus("sold");
+                this.marketNativeRepository.updateList(marketModel);
+
+                result.setData("The purchase is completed");
+            }else{
+                result.setData("Your money is not enough");
+            }
         }catch (Exception e){
             result.setStatus(500);
             result.setDescription(e.getMessage());

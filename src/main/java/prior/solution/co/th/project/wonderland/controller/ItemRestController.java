@@ -25,8 +25,8 @@ public class ItemRestController {
     }
 
     @GetMapping("/find/item")
-    public ResponseModel<ItemModel> getPLayer(@RequestBody ItemModel itemModel){
-        return this.itemService.getItemByNativeSql(itemModel);
+    public ResponseModel<ItemModel> getPLayer(@RequestBody int itemId){
+        return this.itemService.getItemByNativeSql(itemId);
     }
 
     @PostMapping("/insert/item")
