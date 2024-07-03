@@ -25,8 +25,8 @@ public class PlayerRestController {
     }
 
     @GetMapping("/find/player")
-    public ResponseModel<PlayerModel> getPLayer(@RequestBody PlayerModel playerModel){
-        return this.playerService.getPlayerByNativeSql(playerModel);
+    public ResponseModel<PlayerModel> getPLayer(@RequestBody int playerId){
+        return this.playerService.getPlayerByNativeSql(playerId);
     }
 
     @PostMapping("/insert/player")

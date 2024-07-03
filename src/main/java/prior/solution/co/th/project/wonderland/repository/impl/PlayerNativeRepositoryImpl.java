@@ -45,11 +45,11 @@ public class PlayerNativeRepositoryImpl implements PlayerNativeRepository {
     }
 
     @Override
-    public PlayerModel findPlayer(PlayerModel playerModel) {
+    public PlayerModel findPlayer(int playerId) {
         List<Object> paramList = new ArrayList<>();
 
         String sql = "SELECT p_id, p_name, p_attack, p_balance FROM player WHERE p_id = ?";
-        paramList.add(playerModel.getPId());
+        paramList.add(playerId);
 
         PlayerModel result = this.jdbcTemplate.queryForObject(sql, paramList.toArray(), new RowMapper<PlayerModel>() {
             @Override

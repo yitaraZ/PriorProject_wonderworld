@@ -45,11 +45,11 @@ public class MonsterNativeRepositoryImpl implements MonsterNativeRepository {
     }
 
     @Override
-    public MonsterModel findMonster(MonsterModel monsterModel) {
+    public MonsterModel findMonster(int monsId) {
         List<Object> paramList = new ArrayList<>();
 
         String sql = "select m_id, m_name, m_hp, item_drop, prize from monster WHERE m_id = ?";
-        paramList.add(monsterModel.getMId());
+        paramList.add(monsId);
 
         MonsterModel result = this.jdbcTemplate.queryForObject(sql, paramList.toArray(), new RowMapper<MonsterModel>() {
             @Override

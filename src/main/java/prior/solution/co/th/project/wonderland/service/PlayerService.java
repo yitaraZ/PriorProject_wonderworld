@@ -97,13 +97,13 @@ public class PlayerService {
         return result;
     }
 
-    public ResponseModel<PlayerModel> getPlayerByNativeSql(PlayerModel playerModel){
+    public ResponseModel<PlayerModel> getPlayerByNativeSql(int playerId){
         ResponseModel<PlayerModel> result = new ResponseModel<>();
 
         result.setStatus(204);
         result.setDescription("find player succes");
         try{
-            PlayerModel transfromedData = playerNativeRepository.findPlayer(playerModel);
+            PlayerModel transfromedData = playerNativeRepository.findPlayer(playerId);
             result.setData(transfromedData);
 
         }catch (Exception e){
@@ -123,14 +123,12 @@ public class PlayerService {
             Map<String, Object> playerMap = (Map<String, Object>) data.get("playerModel");
             Map<String, Object> monsterMap = (Map<String, Object>) data.get("monsterModel");
 
-            PlayerModel playerModel = new PlayerModel();
-            playerModel.setPId((Integer) playerMap.get("pId"));
+            int playerId = (Integer) playerMap.get("pId");
 
-            MonsterModel monsterModel = new MonsterModel();
-            monsterModel.setMId((Integer) monsterMap.get("mId"));
+            int monsId = (Integer) monsterMap.get("mId");
 
-            PlayerModel player = playerNativeRepository.findPlayer(playerModel);
-            MonsterModel monster = monsterNativeRepository.findMonster(monsterModel);
+            PlayerModel player = playerNativeRepository.findPlayer(playerId);
+            MonsterModel monster = monsterNativeRepository.findMonster(monsId);
             List<PlayerItemModel> playerItem = new ArrayList<>();
 
             int playerAtk = player.getAtk();
@@ -139,13 +137,13 @@ public class PlayerService {
             if(playerAtk < monsterHp){
                 monsterHp -= playerAtk;
                 monster.setHp(monsterHp);
-                monsterNativeRepository.updateMonster(monster);
+                this.monsterNativeRepository.updateMonster(monster);
 
                 result.setData(monster);
             }else{
                 monsterHp = 0;
                 monster.setHp(monsterHp);
-                monsterNativeRepository.updateMonster(monster);
+                this.monsterNativeRepository.updateMonster(monster);
 
                 int monsItem = monster.getItemDrop();
                 PlayerItemModel pi = new PlayerItemModel();
@@ -153,15 +151,15 @@ public class PlayerService {
                 pi.setItemId(monsItem);
                 pi.setQuantity(1);
                 playerItem.add(pi);
-                playerItemNativeRepository.insertPlayerItem(playerItem);
+                this.playerItemNativeRepository.insertPlayerItem(playerItem);
 
                 double playerBalance = player.getBalance();
                 playerBalance += monster.getPrize();
                 player.setBalance(playerBalance);
-                playerNativeRepository.updatePlayer(player);
+                this.playerNativeRepository.updatePlayer(player);
 
                 result.setData(monster);
-                monsterNativeRepository.deleteMonster(monsterModel);
+                this.monsterNativeRepository.deleteMonster(monster);
 
             }
         }catch (Exception e){
@@ -170,4 +168,6 @@ public class PlayerService {
         }
         return result;
     }
+
+
 }

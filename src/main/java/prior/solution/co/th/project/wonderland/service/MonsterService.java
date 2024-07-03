@@ -82,13 +82,13 @@ public class MonsterService {
         return result;
     }
 
-    public ResponseModel<MonsterModel> getMonsterByNativeSql(MonsterModel monsterModel){
+    public ResponseModel<MonsterModel> getMonsterByNativeSql(int monsId){
         ResponseModel<MonsterModel> result = new ResponseModel<>();
 
         result.setStatus(204);
         result.setDescription("find monster succes");
         try{
-            MonsterModel transfromedData = monsterNativeRepository.findMonster(monsterModel);
+            MonsterModel transfromedData = monsterNativeRepository.findMonster(monsId);
             result.setData(transfromedData);
 
         }catch (Exception e){

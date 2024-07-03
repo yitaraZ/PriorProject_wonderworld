@@ -11,7 +11,7 @@ public interface MonsterNativeRepository {
 
     public List<MonsterModel> findAllMonster();
 
-    public MonsterModel findMonster(MonsterModel monsterModel);
+    public MonsterModel findMonster(int monsId);
 
     public int insertMonster(List<MonsterModel> monsterModels);
 

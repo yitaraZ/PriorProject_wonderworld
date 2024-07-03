@@ -62,14 +62,14 @@ public class MarketService {
             int itemId = marketModel.getItemId();
             double itemPrice = itemNativeRepository.getItemPrice(itemId);
             marketModel.setPrice(itemPrice);
-            marketNativeRepository.insertList(marketModel);
+            this.marketNativeRepository.insertList(marketModel);
 
-            playerItemNativeRepository.deletePlayerItem(sellerId, itemId);
+            this.playerItemNativeRepository.deletePlayerItem(sellerId, itemId);
 
             InboxModel inboxModel = new InboxModel();
             inboxModel.setPId(marketModel.getSellerId());
             inboxModel.setMessage("Successfully consigned items");
-            inboxNativeRepository.insertInbox(inboxModel);
+            this.inboxNativeRepository.insertInbox(inboxModel);
 
             List<MarketModel> list = this.marketNativeRepository.findAllList();
             result.setData(list);
@@ -78,6 +78,26 @@ public class MarketService {
             result.setStatus(500);
             result.setDescription(e.getMessage());
         }
+        return result;
+    }
+
+    //ซื้อไอเทม
+    public ResponseModel<Void> buyItemByNativeSql (Map<String, Object> data){
+        ResponseModel<Void> result = new ResponseModel<>();
+
+        result.setStatus(206);
+        result.setDescription("buy item success");
+        try{
+            Map<String, Object> playerMap = (Map<String, Object>) data.get("playerModel");
+            Map<String, Object> itemMap = (Map<String, Object>) data.get("itemModel");
+
+            PlayerModel playerModel = new PlayerModel();
+            playerModel.setPId((Integer) playerMap.get("pId"));
+        }catch (Exception e){
+            result.setStatus(500);
+            result.setDescription(e.getMessage());
+        }
+
         return result;
     }
 }

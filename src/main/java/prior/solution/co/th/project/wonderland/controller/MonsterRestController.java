@@ -25,8 +25,8 @@ public class MonsterRestController {
     }
 
     @GetMapping("/find/monster")
-    public ResponseModel<MonsterModel> getMonster(@RequestBody MonsterModel monsterModel){
-        return this.monsterService.getMonsterByNativeSql(monsterModel);
+    public ResponseModel<MonsterModel> getMonster(@RequestBody int monsId){
+        return this.monsterService.getMonsterByNativeSql(monsId);
     }
 
     @PostMapping("/insert/monster")

@@ -11,7 +11,7 @@ public interface PlayerNativeRepository {
 
     public List<PlayerModel> findAllPlayer();
 
-    public PlayerModel findPlayer(PlayerModel playerModel);
+    public PlayerModel findPlayer(int playerId);
 
     public int insertPlayer(List<PlayerModel> playerModels);
 
