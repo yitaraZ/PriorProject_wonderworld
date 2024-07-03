@@ -24,5 +24,8 @@ public class MarketRestController {
         return this.marketService.getAllListByNativeSql();
     }
 
-
+    @PostMapping("/sell/item")
+    public ResponseModel<List<MarketModel>> sellItem(@RequestBody MarketModel marketModel){
+        return this.marketService.sellItemByNativeSql(marketModel);
+    }
 }

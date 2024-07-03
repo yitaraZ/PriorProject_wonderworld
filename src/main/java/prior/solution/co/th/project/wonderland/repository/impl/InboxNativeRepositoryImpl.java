@@ -45,18 +45,14 @@ public class InboxNativeRepositoryImpl implements InboxNativeRepository {
 
     @Override
     public int insertInbox(InboxModel inboxModel) {
-        List<Object> paramList = new ArrayList<>();
+        String getIdSql = "SELECT COALESCE(MAX(inbox_id), 0) + 1 FROM inbox";
+        int newInboxId = this.jdbcTemplate.queryForObject(getIdSql, Integer.class);
 
-        String sql = "insert into inbox (inbox_id, p_id, message, sent_date) values ";
-        String value = "((SELECT COALESCE(MAX(inbox_id), 0) + 1 FROM inbox), ?, ?, ?)";
+        String sql = "INSERT INTO inbox (inbox_id, p_id, message, sent_date) VALUES (?, ?, ?, CURRENT_TIMESTAMP)";
 
-        paramList.add(inboxModel.getInboxId());
-        paramList.add(inboxModel.getPId());
-        paramList.add(inboxModel.getMessage());
-        paramList.add(inboxModel.getDate());
+        Object[] params = new Object[]{newInboxId, inboxModel.getPId(), inboxModel.getMessage()};
 
-        int insertCount = this.jdbcTemplate.update(sql + value, paramList.toArray());
-
+        int insertCount = this.jdbcTemplate.update(sql, params);
         return insertCount;
     }
 

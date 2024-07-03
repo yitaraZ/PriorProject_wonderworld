@@ -124,4 +124,13 @@ public class ItemNativeRepositoryImpl implements ItemNativeRepository {
             this.jdbcTemplate.update(sql, paramList.toArray());
         }
     }
+
+    @Override
+    public double getItemPrice(int itemId) {
+        String sql = "SELECT i_price FROM item WHERE i_id = ?";
+        Object[] params = new Object[]{itemId};
+        Double price = this.jdbcTemplate.queryForObject(sql, params, Double.class);
+        return price != null ? price : 0.0;
+    }
+
 }

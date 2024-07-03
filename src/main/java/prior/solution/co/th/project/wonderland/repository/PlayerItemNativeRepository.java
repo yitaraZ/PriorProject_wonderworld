@@ -14,5 +14,6 @@ public interface PlayerItemNativeRepository {
 
     public int updatePlayerItem(PlayerItemModel playerItemModel);
 
-    public void deletePlayerItem(PlayerItemModel playerItemModel);
+    public void deletePlayerItem(int pId, int itemId);
+
 }

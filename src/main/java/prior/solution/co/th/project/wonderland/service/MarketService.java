@@ -51,18 +51,28 @@ public class MarketService {
     }
 
 
-
-    public ResponseModel<MarketModel> sellItemByNativeSql (MarketModel marketModel){
-        ResponseModel<MarketModel> result = new ResponseModel<>();
+    //ประกาศขายไอเทม
+    public ResponseModel<List<MarketModel>> sellItemByNativeSql (MarketModel marketModel){
+        ResponseModel<List<MarketModel>> result = new ResponseModel<>();
 
         result.setStatus(205);
         result.setDescription("item sell success");
         try{
+            int sellerId = marketModel.getSellerId();
+            int itemId = marketModel.getItemId();
+            double itemPrice = itemNativeRepository.getItemPrice(itemId);
+            marketModel.setPrice(itemPrice);
             marketNativeRepository.insertList(marketModel);
 
-            int item = marketModel.getItemId();
-            int sellerId = marketModel.getSellerId();
-            //playerItemNativeRepository.deletePlayerItem();
+            playerItemNativeRepository.deletePlayerItem(sellerId, itemId);
+
+            InboxModel inboxModel = new InboxModel();
+            inboxModel.setPId(marketModel.getSellerId());
+            inboxModel.setMessage("Successfully consigned items");
+            inboxNativeRepository.insertInbox(inboxModel);
+
+            List<MarketModel> list = this.marketNativeRepository.findAllList();
+            result.setData(list);
 
         }catch (Exception e){
             result.setStatus(500);

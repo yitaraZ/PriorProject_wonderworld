@@ -117,13 +117,11 @@ public class PlayerItemNativeRepositoryImpl implements PlayerItemNativeRepositor
     }
 
     @Override
-    public void deletePlayerItem(PlayerItemModel playerItemModel) {
-        List<Object> paramList = new ArrayList<>();
+    public void deletePlayerItem(int pId, int itemId) {
+        String sql = " delete from player_item where p_id = ? and i_id = ?";
+        Object[] params = new Object[]{pId, itemId};
+        // Execute the update query
+        this.jdbcTemplate.update(sql, params);
 
-        String sql = " delete from player_item where p_item_id = ?";
-        if(StringUtils.isNotEmpty(String.valueOf(playerItemModel.getPItemId()))){
-            paramList.add(playerItemModel.getPItemId());
-            this.jdbcTemplate.update(sql, paramList.toArray());
-        }
     }
 }

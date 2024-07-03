@@ -17,4 +17,6 @@ public interface ItemNativeRepository {
 
     public void deleteItem(ItemModel itemModel);
 
+    public double getItemPrice(int itemId);
+
 }

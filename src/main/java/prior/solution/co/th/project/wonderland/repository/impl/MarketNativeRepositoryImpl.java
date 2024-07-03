@@ -49,14 +49,18 @@ public class MarketNativeRepositoryImpl implements MarketNativeRepository {
     public int insertList(MarketModel marketModel) {
         List<Object> paramList = new ArrayList<>();
 
-        String sql = "insert into market (list_id, seller_id, i_id, quantity, price, status) values ";
-        String value = "((SELECT COALESCE(MAX(list_id), 0) + 1 FROM inbox), ?, ?, 1, ?, 'sell')";
+        String getIdSql = "SELECT COALESCE(MAX(list_id), 0) + 1 FROM market";
+        int newListId = this.jdbcTemplate.queryForObject(getIdSql, Integer.class);
 
+        String sql = "INSERT INTO market (list_id, seller_id, i_id, quantity, price, status) " +
+                "VALUES (?, ?, ?, 1, ?, 'sell')";
+
+        paramList.add(newListId);
         paramList.add(marketModel.getSellerId());
         paramList.add(marketModel.getItemId());
         paramList.add(marketModel.getPrice());
 
-        int insertCount = this.jdbcTemplate.update(sql + value, paramList.toArray());
+        int insertCount = this.jdbcTemplate.update(sql, paramList.toArray());
 
         return insertCount;
     }
