@@ -53,16 +53,20 @@ public class MarketService {
 
 
     //ประกาศขายไอเทม
-    public ResponseModel<List<MarketModel>> sellItemByNativeSql (MarketModel marketModel){
+    public ResponseModel<List<MarketModel>> sellItemByNativeSql (PlayerItemModel playerItemModel){
         ResponseModel<List<MarketModel>> result = new ResponseModel<>();
 
         result.setStatus(205);
         result.setDescription("item sell success");
         try{
-            int sellerId = marketModel.getSellerId();
-            int itemId = marketModel.getItemId();
-            double itemPrice = itemNativeRepository.getItemPrice(itemId);
+            MarketModel marketModel = new MarketModel();
+            int sellerId = playerItemModel.getPId();
+            int itemId = playerItemModel.getItemId();
+            double itemPrice = this.itemNativeRepository.getItemPrice(itemId);
+            marketModel.setSellerId(sellerId);
+            marketModel.setItemId(itemId);
             marketModel.setPrice(itemPrice);
+
             this.marketNativeRepository.insertList(marketModel);
 
             this.playerItemNativeRepository.deletePlayerItem(sellerId, itemId);
@@ -104,35 +108,45 @@ public class MarketService {
             double itemPrice = itemModel.getItemPrice();
             List<PlayerItemModel> playerItem = new ArrayList<>();
 
-            if(playerBalance >= itemPrice){
-                playerBalance -= itemPrice;
-                playerModel.setBalance(playerBalance);
-                this.playerNativeRepository.updatePlayer(playerModel);
+            if ("sell".equals(marketModel.getStatus())) {
+                if (playerModel.getPId() != marketModel.getSellerId()) {
+                    if (playerBalance >= itemPrice) {
+                        playerBalance -= itemPrice;
+                        playerModel.setBalance(playerBalance);
+                        this.playerNativeRepository.updatePlayer(playerModel);
 
-                PlayerModel seller = this.playerNativeRepository.findPlayer(marketModel.getSellerId());
-                double sellerBalance = seller.getBalance() + itemPrice;
-                seller.setBalance(sellerBalance);
-                this.playerNativeRepository.updatePlayer(seller);
+                        PlayerModel seller = this.playerNativeRepository.findPlayer(marketModel.getSellerId());
+                        double sellerBalance = seller.getBalance() + itemPrice;
+                        seller.setBalance(sellerBalance);
+                        this.playerNativeRepository.updatePlayer(seller);
 
-                PlayerItemModel pi = new PlayerItemModel();
-                pi.setItemId(itemId);
-                pi.setPId(playerId);
-                pi.setQuantity(1);
-                playerItem.add(pi);
-                this.playerItemNativeRepository.insertPlayerItem(playerItem);
+                        PlayerItemModel pi = new PlayerItemModel();
+                        pi.setItemId(itemId);
+                        pi.setPId(playerId);
+                        pi.setQuantity(1);
+                        playerItem.add(pi);
+                        this.playerItemNativeRepository.insertPlayerItem(playerItem);
 
-                InboxModel inboxModel = new InboxModel();
-                inboxModel.setPId(marketModel.getSellerId());
-                inboxModel.setMessage("Your item was sold");
-                this.inboxNativeRepository.insertInbox(inboxModel);
+                        InboxModel inboxModel = new InboxModel();
+                        inboxModel.setPId(marketModel.getSellerId());
+                        inboxModel.setMessage("Your item was sold");
+                        this.inboxNativeRepository.insertInbox(inboxModel);
 
-                marketModel.setStatus("sold");
-                this.marketNativeRepository.updateList(marketModel);
+                        marketModel.setStatus("sold");
+                        this.marketNativeRepository.updateList(marketModel);
 
-                result.setData("The purchase is completed");
-            }else{
-                result.setData("Your money is not enough");
+                        result.setData("The purchase is completed");
+                    } else {
+                        result.setData("Your money is not enough");
+                    }
+                }else {
+                    result.setData("You can't buy your own item");
+                }
+            } else {
+                result.setData("This item was sold");
             }
+
+
         }catch (Exception e){
             result.setStatus(500);
             result.setDescription(e.getMessage());
