@@ -8,6 +8,7 @@ import prior.solution.co.th.project.wonderland.model.ResponseModel;
 import prior.solution.co.th.project.wonderland.service.MonsterService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api")
@@ -25,7 +26,8 @@ public class MonsterRestController {
     }
 
     @GetMapping("/find/monster")
-    public ResponseModel<MonsterModel> getMonster(@RequestBody int monsId){
+    public ResponseModel<MonsterModel> getMonster(@RequestBody Map<String, Object> data){
+        int monsId = (Integer) data.get("mId");
         return this.monsterService.getMonsterByNativeSql(monsId);
     }
 

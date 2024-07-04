@@ -8,6 +8,7 @@ import prior.solution.co.th.project.wonderland.model.ResponseModel;
 import prior.solution.co.th.project.wonderland.service.ItemService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api")
@@ -25,7 +26,8 @@ public class ItemRestController {
     }
 
     @GetMapping("/find/item")
-    public ResponseModel<ItemModel> getPLayer(@RequestBody int itemId){
+    public ResponseModel<ItemModel> getPLayer(@RequestBody Map<String, Object> data){
+        int itemId = (Integer) data.get("pId");
         return this.itemService.getItemByNativeSql(itemId);
     }
 
