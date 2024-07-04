@@ -26,11 +26,11 @@ public class MarketRestController {
     }
 
     @PostMapping("/sell/item")
-    public ResponseModel<List<MarketModel>> sellItem(@RequestBody PlayerItemModel playerItemModel){
-        return this.marketService.sellItemByNativeSql(playerItemModel);
+    public ResponseModel<List<MarketModel>> sellItem(@RequestBody Map<String, Object> data){
+        return this.marketService.sellItemByNativeSql(data);
     }
 
-    @PostMapping("/buy/item")
+    @PutMapping("/buy/item")
     public ResponseModel<String> buyItem(@RequestBody Map<String, Object> data){
         return this.marketService.buyItemByNativeSql(data);
     }

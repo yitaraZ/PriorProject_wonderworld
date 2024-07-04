@@ -8,4 +8,5 @@ public class PlayerItemModel {
     private int pId;
     private int itemId;
     private int quantity;
+    private String status;
 }

@@ -27,7 +27,7 @@ public class MarketNativeRepositoryImpl implements MarketNativeRepository {
 
     @Override
     public List<MarketModel> findAllList() {
-        String sql = "select list_id, seller_id, i_id, quantity, price, status from market";
+        String sql = "select list_id, p_item_id, quantity, price, status from market";
 
         List<MarketModel> result = this.jdbcTemplate.query(sql, new RowMapper<MarketModel>() {
             @Override
@@ -35,8 +35,7 @@ public class MarketNativeRepositoryImpl implements MarketNativeRepository {
                 MarketModel x = new MarketModel();
                 int col = 1;
                 x.setListId(rs.getInt(col++));
-                x.setSellerId(rs.getInt(col++));
-                x.setItemId(rs.getInt(col++));
+                x.setPItemId(rs.getInt(col++));
                 x.setQty(rs.getInt(col++));
                 x.setPrice(rs.getDouble(col++));
                 x.setStatus(rs.getString(col++));
@@ -53,12 +52,11 @@ public class MarketNativeRepositoryImpl implements MarketNativeRepository {
         String getIdSql = "SELECT COALESCE(MAX(list_id), 0) + 1 FROM market";
         int newListId = this.jdbcTemplate.queryForObject(getIdSql, Integer.class);
 
-        String sql = "INSERT INTO market (list_id, seller_id, i_id, quantity, price, status) " +
-                "VALUES (?, ?, ?, 1, ?, 'sell')";
+        String sql = "INSERT INTO market (list_id, p_item_id, quantity, price, status) " +
+                "VALUES (?, ?, 1, ?, 'sell')";
 
         paramList.add(newListId);
-        paramList.add(marketModel.getSellerId());
-        paramList.add(marketModel.getItemId());
+        paramList.add(marketModel.getPItemId());
         paramList.add(marketModel.getPrice());
 
         int insertCount = this.jdbcTemplate.update(sql, paramList.toArray());
@@ -101,7 +99,7 @@ public class MarketNativeRepositoryImpl implements MarketNativeRepository {
     public MarketModel findList(int ListId) {
         List<Object> paramList = new ArrayList<>();
 
-        String sql = "select list_id, seller_id, i_id, quantity, price, status from market WHERE list_id = ?";
+        String sql = "select list_id, p_item_id, quantity, price, status from market WHERE list_id = ?";
         paramList.add(ListId);
 
         MarketModel result = this.jdbcTemplate.queryForObject(sql, paramList.toArray(), new RowMapper<MarketModel>() {
@@ -109,8 +107,7 @@ public class MarketNativeRepositoryImpl implements MarketNativeRepository {
             public MarketModel mapRow(ResultSet rs, int rowNum) throws SQLException {
                 MarketModel market = new MarketModel();
                 market.setListId(rs.getInt("list_id"));
-                market.setSellerId(rs.getInt("seller_id"));
-                market.setItemId(rs.getInt("i_id"));
+                market.setPItemId(rs.getInt("p_item_id"));
                 market.setQty(rs.getInt("quantity"));
                 market.setPrice(rs.getDouble("price"));
                 market.setStatus(rs.getString("status"));

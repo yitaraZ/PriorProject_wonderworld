@@ -33,7 +33,7 @@ public class PlayerItemService {
 
 
 
-    public ResponseModel<PlayerItemModel> getPlayerItemByNativeSql(PlayerItemModel playerItemModel){
+    public ResponseModel<PlayerItemModel> getPlayerItemByNativeSql(int playerItemModel){
         ResponseModel<PlayerItemModel> result = new ResponseModel<>();
 
         result.setStatus(204);

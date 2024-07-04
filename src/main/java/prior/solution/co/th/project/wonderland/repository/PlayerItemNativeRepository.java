@@ -8,7 +8,7 @@ public interface PlayerItemNativeRepository {
 
     public List<PlayerItemModel> findAllPlayerItem();
 
-    public PlayerItemModel findPlayerItem(PlayerItemModel playerItemModel);
+    public PlayerItemModel findPlayerItem(int playerItemModel);
 
     public int insertPlayerItem(List<PlayerItemModel> playerItemModels);
 

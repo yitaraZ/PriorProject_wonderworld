@@ -53,31 +53,40 @@ public class MarketService {
 
 
     //ประกาศขายไอเทม
-    public ResponseModel<List<MarketModel>> sellItemByNativeSql (PlayerItemModel playerItemModel){
+    public ResponseModel<List<MarketModel>> sellItemByNativeSql (Map<String, Object> data){
         ResponseModel<List<MarketModel>> result = new ResponseModel<>();
 
         result.setStatus(205);
         result.setDescription("item sell success");
         try{
-            MarketModel marketModel = new MarketModel();
-            int sellerId = playerItemModel.getPId();
-            int itemId = playerItemModel.getItemId();
-            double itemPrice = this.itemNativeRepository.getItemPrice(itemId);
-            marketModel.setSellerId(sellerId);
-            marketModel.setItemId(itemId);
-            marketModel.setPrice(itemPrice);
+            int playerItemId = (Integer) data.get("pItemId");
+            PlayerItemModel playerItemModel = this.playerItemNativeRepository.findPlayerItem(playerItemId);
 
-            this.marketNativeRepository.insertList(marketModel);
+            if(playerItemModel.getStatus().equals("selling")){
+                result.setData(null);
+            }else {
+                MarketModel marketModel = new MarketModel();
+                int sellerId = playerItemModel.getPId();
+                int pItemId = playerItemModel.getPItemId();
+                int itemId = playerItemModel.getItemId();
+                double itemPrice = this.itemNativeRepository.getItemPrice(itemId);
+                marketModel.setPItemId(pItemId);
+                marketModel.setPrice(itemPrice);
 
-            this.playerItemNativeRepository.deletePlayerItem(sellerId, itemId);
+                this.marketNativeRepository.insertList(marketModel);
 
-            InboxModel inboxModel = new InboxModel();
-            inboxModel.setPId(marketModel.getSellerId());
-            inboxModel.setMessage("Successfully consigned items");
-            this.inboxNativeRepository.insertInbox(inboxModel);
+                PlayerItemModel play = playerItemModel;
+                play.setStatus("selling");
+                this.playerItemNativeRepository.updatePlayerItem(play);
 
-            List<MarketModel> list = this.marketNativeRepository.findAllList();
-            result.setData(list);
+                InboxModel inboxModel = new InboxModel();
+                inboxModel.setPId(sellerId);
+                inboxModel.setMessage("Item" + itemId + " Successfully consigned items");
+                this.inboxNativeRepository.insertInbox(inboxModel);
+
+                List<MarketModel> list = this.marketNativeRepository.findAllList();
+                result.setData(list);
+            }
 
         }catch (Exception e){
             result.setStatus(500);
@@ -100,50 +109,46 @@ public class MarketService {
             PlayerModel playerModel = this.playerNativeRepository.findPlayer(playerId);
             MarketModel marketModel = this.marketNativeRepository.findList(listId);
 
-            int itemId = marketModel.getItemId();
+            int pItemId = marketModel.getPItemId();
+            PlayerItemModel playerItemModel = this.playerItemNativeRepository.findPlayerItem(pItemId);
 
+            int itemId = playerItemModel.getItemId();
             ItemModel itemModel = this.itemNativeRepository.findItem(itemId);
 
             double playerBalance = playerModel.getBalance();
             double itemPrice = itemModel.getItemPrice();
-            List<PlayerItemModel> playerItem = new ArrayList<>();
+
 
             if ("sell".equals(marketModel.getStatus())) {
-                if (playerModel.getPId() != marketModel.getSellerId()) {
+                if (playerId != playerItemModel.getPId()) {
                     if (playerBalance >= itemPrice) {
                         playerBalance -= itemPrice;
                         playerModel.setBalance(playerBalance);
                         this.playerNativeRepository.updatePlayer(playerModel);
 
-                        PlayerModel seller = this.playerNativeRepository.findPlayer(marketModel.getSellerId());
+                        PlayerModel seller = this.playerNativeRepository.findPlayer(playerItemModel.getPId());
                         double sellerBalance = seller.getBalance() + itemPrice;
                         seller.setBalance(sellerBalance);
                         this.playerNativeRepository.updatePlayer(seller);
 
-                        PlayerItemModel pi = new PlayerItemModel();
-                        pi.setItemId(itemId);
-                        pi.setPId(playerId);
-                        pi.setQuantity(1);
-                        playerItem.add(pi);
-                        this.playerItemNativeRepository.insertPlayerItem(playerItem);
-
                         InboxModel inboxModel = new InboxModel();
-                        inboxModel.setPId(marketModel.getSellerId());
-                        inboxModel.setMessage("Your item was sold");
+                        inboxModel.setPId(playerItemModel.getPId());
+                        inboxModel.setMessage("Your item" + itemModel.getItemName() + " was sold");
                         this.inboxNativeRepository.insertInbox(inboxModel);
 
                         marketModel.setStatus("sold");
                         this.marketNativeRepository.updateList(marketModel);
 
+                        playerItemModel.setPId(playerId);
+                        playerItemModel.setStatus("normal");
+                        this.playerItemNativeRepository.updatePlayerItem(playerItemModel);
                         result.setData("The purchase is completed");
                     } else {
                         result.setData("Your money is not enough");
                     }
-                }else {
+                } else {
                     result.setData("You can't buy your own item");
                 }
-            } else {
-                result.setData("This item was sold");
             }
 
 
