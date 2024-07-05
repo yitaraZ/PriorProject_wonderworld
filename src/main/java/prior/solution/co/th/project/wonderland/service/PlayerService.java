@@ -120,10 +120,7 @@ public class PlayerService {
         result.setStatus(205);
         result.setDescription("player attack!");
         try{
-
-
             int playerId = (Integer) data.get("pId");
-
             int monsId = (Integer) data.get("mId");
 
             PlayerModel player = playerNativeRepository.findPlayer(playerId);

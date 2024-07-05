@@ -1,0 +1,9 @@
+
+spring:
+  application:
+    name: wonderworld
+  datasource:
+    username: root
+    password: password
+    url: jdbc:mysql://db:3306/wonderworld
+    driver-class-name: com.mysql.cj.jdbc.Driver
