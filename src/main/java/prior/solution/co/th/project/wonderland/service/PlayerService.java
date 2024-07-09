@@ -1,6 +1,10 @@
 package prior.solution.co.th.project.wonderland.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import prior.solution.co.th.project.wonderland.component.KafkaComponent;
 import prior.solution.co.th.project.wonderland.model.MonsterModel;
 import prior.solution.co.th.project.wonderland.model.PlayerItemModel;
 import prior.solution.co.th.project.wonderland.model.PlayerModel;
@@ -17,6 +21,10 @@ import java.util.Map;
 @Service
 public class PlayerService {
 
+    @Value("${kafka.topics.regist}")
+    private String registTopic;
+    private KafkaComponent kafkaComponent;
+
     private PlayerNativeRepository playerNativeRepository;
 
     private MonsterNativeRepository monsterNativeRepository;
@@ -24,10 +32,16 @@ public class PlayerService {
     private PlayerItemNativeRepository playerItemNativeRepository;
 
     public PlayerService(PlayerNativeRepository playerNativeRepository, MonsterNativeRepository monsterNativeRepository,
-                         PlayerItemNativeRepository playerItemNativeRepository) {
+                         PlayerItemNativeRepository playerItemNativeRepository, KafkaComponent kafkaComponent) {
         this.playerNativeRepository = playerNativeRepository;
         this.monsterNativeRepository = monsterNativeRepository;
         this.playerItemNativeRepository = playerItemNativeRepository;
+        this.kafkaComponent = kafkaComponent;
+    }
+
+    private String objectToJsonString(Object model) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsString(model);
     }
 
     public ResponseModel<List<PlayerModel>> getAllPlayerByNativeSql(){
@@ -36,6 +50,7 @@ public class PlayerService {
         result.setStatus(200);
         result.setDescription("find all players");
         try{
+
             List<PlayerModel> transfromedData = playerNativeRepository.findAllPlayer();
             result.setData(transfromedData);
 
@@ -48,15 +63,16 @@ public class PlayerService {
     }
 
 
-
     public ResponseModel<Integer> insertPlayerByNativeSql(List<PlayerModel> playerModels){
         ResponseModel<Integer> result = new ResponseModel<>();
 
         result.setStatus(201);
         result.setDescription("insert players success");
         try{
-            int insertedRows = this.playerNativeRepository.insertPlayer(playerModels);
-            result.setData(insertedRows);
+            String message = this.objectToJsonString(playerModels);
+            this.kafkaComponent.sendData(message, this.registTopic);
+//            int insertedRows = this.playerNativeRepository.insertPlayer(playerModels);
+//            result.setData(insertedRows);
         }catch (Exception e){
             result.setStatus(500);
             result.setDescription(e.getMessage());
