@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wonderworld-configmap
+  namespace: wonderworld-dev
+data:
+  application.yaml: |+
+    spring:
+      application:
+        name: wonderworld
+      datasource:
+        username: root
+        password: password
+        url: jdbc:mysql://host.minikube.internal:4000/wonderworld
+        driver-class-name: com.mysql.cj.jdbc.Driver
+    server:
+      servlet:
+        context-path: /wonderworld
