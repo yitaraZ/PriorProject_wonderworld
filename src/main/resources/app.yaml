@@ -12,3 +12,4 @@ kafka:
   server: localhost:29092
   topics:
     regist: regist.topic
+
