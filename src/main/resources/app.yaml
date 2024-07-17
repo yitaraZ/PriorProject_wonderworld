@@ -13,3 +13,6 @@ kafka:
   topics:
     regist: regist.topic
 
+app:
+  jasperFolder: C:\Users\ASUS\JaspersoftWorkspace\MyReports\
+  jasperFile: Player.jrxml

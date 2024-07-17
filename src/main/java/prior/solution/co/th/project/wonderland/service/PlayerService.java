@@ -2,7 +2,11 @@ package prior.solution.co.th.project.wonderland.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import prior.solution.co.th.project.wonderland.component.KafkaComponent;
 import prior.solution.co.th.project.wonderland.model.MonsterModel;
@@ -14,15 +18,20 @@ import prior.solution.co.th.project.wonderland.repository.MonsterNativeRepositor
 import prior.solution.co.th.project.wonderland.repository.PlayerItemNativeRepository;
 import prior.solution.co.th.project.wonderland.repository.PlayerNativeRepository;
 
+import java.io.OutputStream;
+import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class PlayerService {
 
     @Value("${kafka.topics.regist}")
     private String registTopic;
+
     private KafkaComponent kafkaComponent;
 
     private PlayerNativeRepository playerNativeRepository;
@@ -159,7 +168,7 @@ public class PlayerService {
 
                 int monsItem = monster.getItemDrop();
                 PlayerItemModel pi = new PlayerItemModel();
-                pi.setPId(player.getPId());
+                pi.setPId(player.getPid());
                 pi.setItemId(monsItem);
                 pi.setQuantity(1);
                 playerItem.add(pi);
@@ -180,6 +189,7 @@ public class PlayerService {
         }
         return result;
     }
+
 
 
 }

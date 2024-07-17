@@ -1,5 +1,6 @@
 package prior.solution.co.th.project.wonderland.service;
 
+import io.micrometer.common.util.StringUtils;
 import org.springframework.stereotype.Service;
 import prior.solution.co.th.project.wonderland.model.MonsterModel;
 import prior.solution.co.th.project.wonderland.model.PlayerModel;
@@ -34,15 +35,29 @@ public class MonsterService {
         return result;
     }
 
+    public int countInsertError(List<MonsterModel> monsterModels){
+        int count = 0;
+        for(MonsterModel m: monsterModels){
+            if(StringUtils.isNotEmpty(m.getMName()) || m.getHp() == 0 || m.getItemDrop() != 0 || m.getPrize() != 0){
+                count++;
+            }
+        }
+        return count;
+    }
+
     public ResponseModel<Integer> insertMonsterByNativeSql(List<MonsterModel> monsterModels){
         ResponseModel<Integer> result = new ResponseModel<>();
 
         result.setStatus(201);
         result.setDescription("insert monsters success");
         try{
-            int insertRow = monsterNativeRepository.insertMonster(monsterModels);
-            result.setData(insertRow);
-
+            if(countInsertError(monsterModels) == 0){
+                int insertRow = monsterNativeRepository.insertMonster(monsterModels);
+                result.setData(insertRow);
+            }else if (countInsertError(monsterModels) > 0){
+                result.setStatus(400);
+                result.setDescription("invalid input");
+            }
         }catch (Exception e){
             result.setStatus(500);
             result.setDescription(e.getMessage());
@@ -51,14 +66,27 @@ public class MonsterService {
         return result;
     }
 
+    public int checkInputError(MonsterModel monsterModel){
+        int countError = 0;
+        if(monsterModel.getMId() == 0){
+            countError++;
+        }
+        return countError;
+    }
+
     public ResponseModel<Integer> updateMonsterByNativeSql(MonsterModel monsterModel){
         ResponseModel<Integer> result = new ResponseModel<>();
 
         result.setStatus(202);
         result.setDescription("Update monster success");
         try{
-            int insertRow = monsterNativeRepository.updateMonster(monsterModel);
-            result.setData(insertRow);
+            if(checkInputError(monsterModel) == 0){
+                int insertRow = monsterNativeRepository.updateMonster(monsterModel);
+                result.setData(insertRow);
+            }else{
+                result.setStatus(400);
+                result.setDescription("invalid input");
+            }
 
         }catch (Exception e){
             result.setStatus(500);

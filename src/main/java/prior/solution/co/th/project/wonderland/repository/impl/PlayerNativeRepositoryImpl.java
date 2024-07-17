@@ -33,8 +33,8 @@ public class PlayerNativeRepositoryImpl implements PlayerNativeRepository {
             public PlayerModel mapRow(ResultSet rs, int rowNum) throws SQLException {
                 PlayerModel x = new PlayerModel();
                 int col = 1;
-                x.setPId(rs.getInt(col++));
-                x.setPName(rs.getString(col++));
+                x.setPid(rs.getInt(col++));
+                x.setPname(rs.getString(col++));
                 x.setAtk(rs.getInt(col++));
                 x.setBalance(rs.getInt(col++));
 
@@ -55,8 +55,8 @@ public class PlayerNativeRepositoryImpl implements PlayerNativeRepository {
             @Override
             public PlayerModel mapRow(ResultSet rs, int rowNum) throws SQLException {
                 PlayerModel player = new PlayerModel();
-                player.setPId(rs.getInt("p_id"));
-                player.setPName(rs.getString("p_name"));
+                player.setPid(rs.getInt("p_id"));
+                player.setPname(rs.getString("p_name"));
                 player.setAtk(rs.getInt("p_attack"));
                 player.setBalance(rs.getInt("p_balance"));
                 return player;
@@ -73,7 +73,7 @@ public class PlayerNativeRepositoryImpl implements PlayerNativeRepository {
         StringJoiner stringJoiner = new StringJoiner(",");
         for(PlayerModel p: playerModels){
             String value = "((SELECT MAX(p_id) + 1 FROM player p) ,? ,? ,?)";
-            paramList.add(p.getPName());
+            paramList.add(p.getPname());
             paramList.add(p.getAtk());
             paramList.add(p.getBalance());
             stringJoiner.add(value);
@@ -92,9 +92,9 @@ public class PlayerNativeRepositoryImpl implements PlayerNativeRepository {
         String sql = " update player set ";
         StringJoiner stringJoiner = new StringJoiner(",");
 
-        if (StringUtils.isNotEmpty(playerModel.getPName())) {
+        if (StringUtils.isNotEmpty(playerModel.getPname())) {
             stringJoiner.add("p_name = ?");
-            paramList.add(playerModel.getPName());
+            paramList.add(playerModel.getPname());
         }
         if (playerModel.getAtk() != 0) {
             stringJoiner.add("p_attack = ?");
@@ -107,7 +107,7 @@ public class PlayerNativeRepositoryImpl implements PlayerNativeRepository {
 
         sql += stringJoiner.toString();
         sql += " where p_id = ? ";
-        paramList.add(playerModel.getPId());
+        paramList.add(playerModel.getPid());
 
         int updateRow = this.jdbcTemplate.update(sql, paramList.toArray());
         return updateRow;
@@ -118,8 +118,8 @@ public class PlayerNativeRepositoryImpl implements PlayerNativeRepository {
         List<Object> paramList = new ArrayList<>();
 
         String sql = " delete from player where p_id = ? ";
-        if (StringUtils.isNotEmpty(String.valueOf(playerModel.getPId()))){
-            paramList.add(playerModel.getPId());
+        if (StringUtils.isNotEmpty(String.valueOf(playerModel.getPid()))){
+            paramList.add(playerModel.getPid());
             this.jdbcTemplate.update(sql, paramList.toArray());
         }
     }

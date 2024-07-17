@@ -16,3 +16,9 @@ data:
     server:
       servlet:
         context-path: /wonderworld
+    kafka:
+      server: host.minikube.internal:49092
+      topics:
+        regist: regist.topic
+    
+
