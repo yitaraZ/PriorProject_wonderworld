@@ -29,40 +29,21 @@ public class ExportPlayerRestController {
 
     @GetMapping("player/pdf")
     public ResponseModel<Void> getPlayerPdf(HttpServletResponse response){
-        response.setContentType("application/pdf");
-
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=PlayerData" + ".pdf";
-        response.setHeader(headerKey, headerValue);
-
         return this.exportPlayerService.getPlayerPdf(response);
     }
 
     @GetMapping("player/csv")
     public ResponseModel<Void> getPlayerCsv(HttpServletResponse response){
-        response.setContentType("application/csv");
-
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=PlayerDataCsv" + ".csv";
-        response.setHeader(headerKey, headerValue);
-
         return this.exportPlayerService.getPlayerCsv( response);
     }
 
     @GetMapping("player/csv2")
     public void getPlayerCsv2(HttpServletResponse response) throws IOException, CsvRequiredFieldEmptyException, CsvDataTypeMismatchException {
+        this.exportPlayerService.getPlayerCsv2(response);
+    }
 
-        //set file name and content type
-        String filename = "Player-data.csv";
-
-        response.setContentType("text/csv");
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=\"" + filename + "\"");
-        //create a csv writer
-        StatefulBeanToCsv<PlayerModel> writer = new StatefulBeanToCsvBuilder<PlayerModel>(response.getWriter())
-                .withQuotechar(CSVWriter.NO_QUOTE_CHARACTER).withSeparator(CSVWriter.DEFAULT_SEPARATOR).withOrderedResults(false)
-                .build();
-        //write all employees data to csv file
-        writer.write(this.exportPlayerService.getPlayerCsv2());
+    @GetMapping("player/excel")
+    public void getPlayerExcel(HttpServletResponse response) throws IOException {
+        this.exportPlayerService.getPlayerExcel(response);
     }
 }
