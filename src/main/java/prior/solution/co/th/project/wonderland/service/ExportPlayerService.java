@@ -1,5 +1,6 @@
 package prior.solution.co.th.project.wonderland.service;
 
+import com.opencsv.bean.StatefulBeanToCsv;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.*;
@@ -14,6 +15,9 @@ import prior.solution.co.th.project.wonderland.repository.PlayerNativeRepository
 
 
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.*;
 
 @Service
@@ -69,15 +73,16 @@ public class ExportPlayerService {
         return result;
     }
 
-    public ResponseModel<Void> getPlayerCsv(HttpServletResponse response) {
+    public ResponseModel<Void> getPlayerCsv( HttpServletResponse response) {
         ResponseModel<Void> result = new ResponseModel<>();
         log.info("getCsv");
 
         result.setStatus(200);
         result.setDescription("getCsv");
         try{
-
-
+            OutputStream outputStream = response.getOutputStream();
+            List<PlayerModel> playerModels = this.playerNativeRepository.findAllPlayer();
+            this.generateCustomerReportCsv(playerModels, outputStream);
         }catch (Exception e){
             log.info("getCsv error {}",e.getMessage());
 
@@ -85,6 +90,32 @@ public class ExportPlayerService {
             result.setDescription("getCsv error "+e.getMessage());
         }
         return result;
+    }
+
+    public void generateCustomerReportCsv(List<PlayerModel> playerModels, OutputStream outputStream) throws IOException {
+
+        String header = String.format("%s|%s|%s|%s","id","name","attack", "balance")+"\r\n";
+        outputStream.write(header.getBytes());
+
+        for (int i = 0; i < playerModels.size(); i++) {
+            int rownum = i+1;
+
+            String data = String.format("%d|%s|%d|%.2f"
+                    , playerModels.get(i).getPid()
+                    , playerModels.get(i).getPname()
+                    , playerModels.get(i).getAtk()
+                    , playerModels.get(i).getBalance())+"\r\n";
+            outputStream.write(data.getBytes());
+            if(i % 20 == 0) {
+                outputStream.flush();
+            }
+        }
+        outputStream.flush();
+
+    }
+
+    public List<PlayerModel> getPlayerCsv2(){
+        return this.playerNativeRepository.findAllPlayer();
     }
 
 }

@@ -8,4 +8,6 @@ import java.sql.Connection;
 public interface ExportPlayerNativeRepository {
 
     public Connection getConnection();
+
+
 }
